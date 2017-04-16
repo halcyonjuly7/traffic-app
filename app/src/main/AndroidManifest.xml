@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.halcyonjuly7.nearby">
+    <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES"/>
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <application
@@ -23,7 +24,10 @@
         <activity android:name=".Activities.ResultsActivity"></activity>
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyC-VAzEM66ZeipDeYzLXQSQWFFgMbSma6I"/>
+            android:value="AIzaSyDdEsWiAivfu1gYZ1XUjWRiFXI5Sb1NyLk"/>
+        <!--<meta-data-->
+            <!--android:name="com.google.android.geo.API_KEY"-->
+            <!--android:value="AIzaSyC-VAzEM66ZeipDeYzLXQSQWFFgMbSma6I"/>-->
 
     </application>
 

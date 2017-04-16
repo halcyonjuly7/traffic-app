@@ -11,6 +11,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.example.halcyonjuly7.nearby.Activities.ResultsActivity;
 import com.example.halcyonjuly7.nearby.ListViewAdapter.ResultsAdapter;
 import com.example.halcyonjuly7.nearby.Modals.PlaceDetails;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -102,15 +103,14 @@ public class ConnectionHandler extends AsyncTask<Void, Void, JSONArray> {
                         @Override
                         public void onResult(@NonNull PlaceBuffer places) {
                             String status = places.getStatus().toString();
-
-                                Toast.makeText(context, places.get(0).getName(), Toast.LENGTH_LONG).show();
-                                String name = places.get(0).getName().toString();
-                                LatLng coords = places.get(0).getLatLng();
-                                PlaceDetails place_modal = new PlaceDetails();
-                                Bundle args = new Bundle();
-                                args.putParcelable("coords", coords);
-                                place_modal.setArguments(args);
-                                place_modal.show(((Activity) context).getFragmentManager(), "hello");
+                            String name = places.get(0).getName().toString();
+                            LatLng coords = places.get(0).getLatLng();
+                            PlaceDetails place_modal = new PlaceDetails();
+                            Bundle args = new Bundle();
+                            args.putParcelable("coords", coords);
+                            args.putString("place_name", name);
+                            place_modal.setArguments(args);
+                            place_modal.show(((ResultsActivity) context).getSupportFragmentManager(),"hello");
 
                             places.release();
                         }
