@@ -3,6 +3,7 @@ package com.example.halcyonjuly7.nearby;
 
 import android.app.Activity;
 import android.content.Context;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -12,6 +13,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.example.halcyonjuly7.nearby.Activities.ResultsActivity;
+import com.example.halcyonjuly7.nearby.Interfaces.IProcessQuery;
 import com.example.halcyonjuly7.nearby.ListViewAdapter.ResultsAdapter;
 import com.example.halcyonjuly7.nearby.Modals.PlaceDetails;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -42,11 +44,9 @@ import javax.net.ssl.HttpsURLConnection;
 public class ConnectionHandler extends AsyncTask<Void, Void, JSONArray> {
     Map<String, String> req_args;
     Context context;
-    GoogleApiClient google_client;
-    public ConnectionHandler(Context context, GoogleApiClient google_client, Map<String, String> args) {
+    public ConnectionHandler(Context context, Map<String, String> args) {
         this.req_args = args;
         this.context = context;
-        this.google_client = google_client;
     }
 
     public String get(String url, Map<String, String> args) {
@@ -90,37 +90,6 @@ public class ConnectionHandler extends AsyncTask<Void, Void, JSONArray> {
 
     @Override
     protected void onPostExecute(JSONArray data) {
-        ListView location_list = (ListView) ((Activity) context).findViewById(R.id.location_list);
-        final ResultsAdapter res_adapter = new ResultsAdapter(context, data);
-        location_list.setAdapter(res_adapter);
-        location_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                JSONObject clicked_item = (JSONObject) res_adapter.getItem(position);
-
-                try {
-                    Places.GeoDataApi.getPlaceById(google_client, clicked_item.getString("place_id")).setResultCallback(new ResultCallback<PlaceBuffer>() {
-                        @Override
-                        public void onResult(@NonNull PlaceBuffer places) {
-                            String status = places.getStatus().toString();
-                            String name = places.get(0).getName().toString();
-                            LatLng coords = places.get(0).getLatLng();
-                            PlaceDetails place_modal = new PlaceDetails();
-                            Bundle args = new Bundle();
-                            args.putParcelable("coords", coords);
-                            args.putString("place_name", name);
-                            place_modal.setArguments(args);
-                            place_modal.show(((ResultsActivity) context).getSupportFragmentManager(),"hello");
-
-                            places.release();
-                        }
-                    });
-                } catch (JSONException e) {
-                    Toast.makeText(context, e.getMessage(), Toast.LENGTH_LONG).show();
-                    e.printStackTrace();
-                }
-
-            }
-        });
+        ((IProcessQuery)context).process_query(data);
     }
 }

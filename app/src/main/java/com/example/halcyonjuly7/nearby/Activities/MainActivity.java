@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
@@ -20,6 +21,9 @@ import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.Toast;
 
+import com.example.halcyonjuly7.nearby.Interfaces.IZipCodeDelete;
+import com.example.halcyonjuly7.nearby.Modals.DeleteZipCodeModal;
+import com.example.halcyonjuly7.nearby.Utils.NetworkHelper;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
@@ -30,8 +34,14 @@ import com.google.android.gms.location.places.Places;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.jar.Manifest;
 
-public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
+public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener, IZipCodeDelete {
+    private ArrayAdapter<String> zip_adapter;
+    private GridView grid_view;
+    private MainActivity context;
+    List<String> zip_codes;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,9 +50,21 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         set_up_shared_preferences();
-        final GridView grid_view = (GridView)findViewById(R.id.zip_codes);
-        final List<String> zip_codes = new ArrayList<>();
-        final ArrayAdapter<String> zip_adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, zip_codes);
+        grid_view = (GridView)findViewById(R.id.zip_codes);
+        context = this;
+        zip_codes = new ArrayList<>();
+        zip_adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, zip_codes);
+        grid_view.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Bundle args = new Bundle();
+                args.putInt("zip_index", i);
+                DeleteZipCodeModal delete_modal = new DeleteZipCodeModal();
+                delete_modal.setArguments(args);
+                delete_modal.show(getSupportFragmentManager(), "zip_delete");
+                return true;
+            }
+        });
         grid_view.setAdapter(zip_adapter);
         final EditText zip_text = (EditText)findViewById(R.id.zip_text);
         Button add_zip = (Button)findViewById(R.id.add_zip);
@@ -50,10 +72,17 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         search_zip.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, ResultsActivity.class);
-                intent.putStringArrayListExtra("zip_codes", (ArrayList<String>)zip_codes);
-                startActivity(intent);
-
+                if(NetworkHelper.is_connected(context)) {
+                    if(zip_codes.size() != 0) {
+                        Intent intent = new Intent(MainActivity.this, ResultsActivity.class);
+                        intent.putStringArrayListExtra("zip_codes", (ArrayList<String>)zip_codes);
+                        startActivity(intent);
+                    } else {
+                        Toast.makeText(context, "There are no zip codes to search", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Toast.makeText(context, "Not connected to network", Toast.LENGTH_SHORT).show();
+                }
             }
         });
         add_zip.setOnClickListener(new View.OnClickListener() {
@@ -68,13 +97,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
             }
         });
-
-
-
-
-
-
-
     }
 
     private void set_up_shared_preferences() {
@@ -117,6 +139,15 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
+
+    }
+
+
+    @Override
+    public void delete_zip(int index) {
+//        grid_view.re(index);
+        zip_codes.remove(index);
+        zip_adapter.notifyDataSetChanged();
 
     }
 

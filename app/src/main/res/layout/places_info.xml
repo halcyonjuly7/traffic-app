@@ -3,30 +3,44 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-
-
+    <TextView
+        android:id="@+id/place_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
-        <TextView
-            android:text="KMKMKMKM"
-            android:layout_width="30dp"
-            android:layout_height="30dp" />
-
         <com.google.android.gms.maps.MapView
             android:id="@+id/map"
             android:layout_width="300dp"
             android:layout_height="300dp"/>
-
-        <!--<fragment-->
-            <!--android:id="@+id/map"-->
-            <!--xmlns:tools="http://schemas.android.com/tools"-->
-            <!--android:name="com.google.android.gms.maps.SupportMapFragment"-->
-            <!--tools:context="com.example.halcyonjuly7.nearby.Activities.ResultsActivity"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="match_parent"/>-->
     </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:drawableTop="@drawable/ic_call_black_24dp"
+            android:id="@+id/place_number"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content" />
+        <TextView
+            android:id="@+id/place_coords"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content" />
+        <TextView
+            android:drawableTop="@drawable/ic_public_black_24dp"
+            android:id="@+id/place_website"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+    <TextView
+        android:id="@+id/place_description"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 
 
 </LinearLayout>
