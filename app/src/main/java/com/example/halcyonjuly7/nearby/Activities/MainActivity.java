@@ -3,6 +3,7 @@ package com.example.halcyonjuly7.nearby.Activities;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
@@ -19,6 +20,8 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.GridView;
+import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.halcyonjuly7.nearby.Interfaces.IZipCodeDelete;
@@ -53,6 +56,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         grid_view = (GridView)findViewById(R.id.zip_codes);
         context = this;
         zip_codes = new ArrayList<>();
+        final Spinner type = (Spinner)findViewById(R.id.place_type);
         zip_adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, zip_codes);
         grid_view.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
@@ -76,6 +80,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     if(zip_codes.size() != 0) {
                         Intent intent = new Intent(MainActivity.this, ResultsActivity.class);
                         intent.putStringArrayListExtra("zip_codes", (ArrayList<String>)zip_codes);
+                        intent.putExtra("place_type", type.getSelectedItem().toString().replaceAll(" ", "_"));
                         startActivity(intent);
                     } else {
                         Toast.makeText(context, "There are no zip codes to search", Toast.LENGTH_SHORT).show();
@@ -104,6 +109,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         if(!shared_pref.contains("server_address")) {
             SharedPreferences.Editor editor = shared_pref.edit();
             editor.putString("server_address", "http://45.55.198.11:7777");
+//            editor.putString("photo_url", "https://maps.googleapis.com/maps/api/place/photo");
+//            editor.putString("api_key", "AIzaSyALBdrH4QFwe5ZE9_Y3G_M0RaSC56DBA2w");
             editor.commit();
         }
     }
@@ -145,7 +152,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     @Override
     public void delete_zip(int index) {
-//        grid_view.re(index);
         zip_codes.remove(index);
         zip_adapter.notifyDataSetChanged();
 

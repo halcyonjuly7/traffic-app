@@ -1,11 +1,14 @@
 package com.example.halcyonjuly7.nearby.Modals;
 
+import com.example.halcyonjuly7.nearby.Containers.Tuple;
 import com.example.halcyonjuly7.nearby.R;
+import com.example.halcyonjuly7.nearby.Utils.ZipCoordHelper;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import android.app.Activity;
@@ -21,7 +24,10 @@ import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
+import java.util.List;
+
 
 /**
  * Created by halcyonjuly7 on 4/5/17.
@@ -30,7 +36,7 @@ import android.widget.TextView;
 public class PlaceDetails extends DialogFragment implements OnMapReadyCallback{
     private MapView map_view;
     Activity context;
-    private final int REQUEST_CALL_PHONE = 1;
+    private final int REQUEST_CALL_PHONE = 2;
     private Bundle arguments;
 
     @Nullable
@@ -42,8 +48,20 @@ public class PlaceDetails extends DialogFragment implements OnMapReadyCallback{
         map_view = (MapView)view.findViewById(R.id.map);
         arguments = getArguments();
         TextView place_name = (TextView)view.findViewById(R.id.place_name);
-        final TextView place_number = (TextView)view.findViewById(R.id.place_number);
-        TextView place_url = (TextView)view.findViewById(R.id.place_website);
+        final ImageView place_number = (ImageView)view.findViewById(R.id.place_number);
+        ImageView place_url = (ImageView)view.findViewById(R.id.place_website);
+        ImageView place_share = (ImageView)view.findViewById(R.id.place_share);
+        place_share.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent share_intent = new Intent(Intent.ACTION_SEND);
+                share_intent.putExtra(Intent.EXTRA_SUBJECT, getArguments().getString("place_address"));
+                share_intent.setType("text/*");
+                startActivity(Intent.createChooser(share_intent, "Select Message"));
+
+
+            }
+        });
         place_url.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -67,8 +85,6 @@ public class PlaceDetails extends DialogFragment implements OnMapReadyCallback{
             }
         });
 
-        place_name.setText(arguments.getString("place_name"));
-        place_number.setText("Call");
         map_view.onCreate(savedInstanceState);
         map_view.getMapAsync(this);
         return view;
@@ -99,17 +115,28 @@ public class PlaceDetails extends DialogFragment implements OnMapReadyCallback{
         map_view.onLowMemory();
     }
 
+
     @Override
     public void onMapReady(GoogleMap googleMap) {
         final LatLng coords = getArguments().getParcelable("coords");
         String place_name = getArguments().getString("place_name");
         googleMap.addMarker(new MarkerOptions().position(coords).title(place_name));
+        ZipCoordHelper zip_helper = new ZipCoordHelper(arguments.getString("zip_coords"));
+        List<Tuple<String, LatLng>> zip_coords = zip_helper.get_latlng();
+        if(zip_coords.size() > 0) {
+            for(Tuple<String, LatLng> coord: zip_coords) {
+                googleMap.addMarker(new MarkerOptions().position(coord.second)
+                        .title(coord.first)
+                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));
+            }
+        }
+
         try {
             MapsInitializer.initialize(getActivity());
         } catch (Exception e) {
             e.printStackTrace();
         }
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(coords, 12.0f));
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(coords, 10.0f));
 
     }
 

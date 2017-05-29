@@ -17,7 +17,7 @@ public class QueryBuilder {
         url_builder.append(url);
         java.util.Iterator map_iterator = query_args.entrySet().iterator();
         Map.Entry first_entry = (Map.Entry) map_iterator.next();
-        url_builder.append(String.format("%s=%s", first_entry.getKey(), first_entry.getValue()));
+        url_builder.append(String.format("?%s=%s", first_entry.getKey(), first_entry.getValue()));
         while(map_iterator.hasNext()) {
             Map.Entry entry = (Map.Entry) map_iterator.next();
             url_builder.append(String.format("&%s=%s", entry.getKey(), entry.getValue()));

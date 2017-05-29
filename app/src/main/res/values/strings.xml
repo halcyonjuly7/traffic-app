@@ -1,5 +1,18 @@
 <resources>
     <string name="app_name">Nearby</string>
     <string name="action_settings">Settings</string>
+    <string-array name="spinnerItems">
+        <item>bar</item>
+        <item>bowling alley</item>
+        <item>cafe</item>
+        <item>gym</item>
+        <item>movie theater</item>
+        <item>night club</item>
+        <item>restaurant</item>
+        <item>shopping mall</item>
+        <item>store</item>
+    </string-array>
+
+
 </resources>
 

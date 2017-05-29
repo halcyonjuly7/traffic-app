@@ -1,12 +1,15 @@
 package com.example.halcyonjuly7.nearby;
 
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -16,6 +19,7 @@ import com.example.halcyonjuly7.nearby.Activities.ResultsActivity;
 import com.example.halcyonjuly7.nearby.Interfaces.IProcessQuery;
 import com.example.halcyonjuly7.nearby.ListViewAdapter.ResultsAdapter;
 import com.example.halcyonjuly7.nearby.Modals.PlaceDetails;
+import com.example.halcyonjuly7.nearby.Utils.RequestHelper;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.location.places.PlaceBuffer;
@@ -41,7 +45,7 @@ import javax.net.ssl.HttpsURLConnection;
  * Created by halcyonjuly7 on 3/19/17.
  */
 
-public class ConnectionHandler extends AsyncTask<Void, Void, JSONArray> {
+public class ConnectionHandler extends AsyncTask<Void, Void, JSONObject> {
     Map<String, String> req_args;
     Context context;
     public ConnectionHandler(Context context, Map<String, String> args) {
@@ -49,47 +53,24 @@ public class ConnectionHandler extends AsyncTask<Void, Void, JSONArray> {
         this.context = context;
     }
 
-    public String get(String url, Map<String, String> args) {
-        try {
-            QueryBuilder query_builder = new QueryBuilder(url);
-            URL built_url = new URL(query_builder.build_query(args));
-            HttpURLConnection conn = (HttpURLConnection) built_url.openConnection();
-            conn.setRequestMethod("GET");
-            conn.connect();
-            if (conn.getResponseCode() == HttpURLConnection.HTTP_OK) {
-                BufferedReader data = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-                String line;
-                StringBuilder response_body = new StringBuilder();
-                while ((line = data.readLine()) != null) {
-                    response_body.append(line);
-
-                }
-                return response_body.toString();
-
-            }
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
     @Override
-    protected JSONArray doInBackground(Void... params) {
-        String response = get("http://45.55.198.11:7777/nearest?", req_args);
-        JSONArray data = null;
+    protected JSONObject doInBackground(Void... params) {
+
+        String response = RequestHelper.get("http://45.55.198.11:7777/nearest", req_args);
+        JSONObject data = null;
         try {
-            JSONObject j_data = new JSONObject(response);
-            data = j_data.getJSONArray("results");
+            data = new JSONObject(response);
+//            data = j_data.getJSONObject("data").getJSONArray("results");
 
         } catch (JSONException e) {
             e.printStackTrace();
         }
+
         return data;
     }
 
     @Override
-    protected void onPostExecute(JSONArray data) {
+    protected void onPostExecute(JSONObject data) {
         ((IProcessQuery)context).process_query(data);
     }
 }
